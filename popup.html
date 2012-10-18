@@ -62,7 +62,7 @@ h1 {
     border-radius: 2px;
     border: 1px solid rgba(255,255,255,0); /* transparent white */
 }
-#entries>li:hover {
+#entries>li:hover, #entries>li.current {
     background-image: -webkit-gradient(linear, left top, left bottom, from(rgba(255,255,255,0.8)), to(rgba(255,255,255,0)));
     border-color: hsl(0,0%,85%);
     background-color: hsl(0,0%,90%);
@@ -73,7 +73,7 @@ h1 {
     text-decoration: none;
     color: #555;
 }
-#entries>li:hover>a {
+#entries>li:hover>a, #entries>li.current>a {
     color: black;
 }
 #entries>li.hidden {

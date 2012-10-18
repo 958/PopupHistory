@@ -78,6 +78,8 @@ function EntryManager(id, count, nonDisplayURL, sort, order) {
     this.init('', count, nonDisplayURL, sort, order);
 }
 EntryManager.prototype = {
+    _CURRENT_CLASS: 'current',
+    _HIDDEN_CLASS: 'hidden',
     _container: null,
     _items: [],
     init: function(query, count, nonDisplayURL, sort, order) {
@@ -99,26 +101,24 @@ EntryManager.prototype = {
                 var f;
                 switch (sort) {
                 case 'Count':
-                    if (order == 'ASC') {
+                    if (order == 'ASC')
                         f = function(a, b){
                             return (a.visitCount == b.visitCount) ? 0 : (a.visitCount < b.visitCount) ? -1 : 1;
                         };
-                    } else {
+                    else
                         f = function(a, b){
                             return (a.visitCount == b.visitCount) ? 0 : (a.visitCount > b.visitCount) ? -1 : 1;
                         };
-                    }
                     break;
                 default:
-                    if (order == 'ASC') {
+                    if (order == 'ASC')
                         f = function(a, b){
                             return (a.lastVisitTime == b.lastVisitTime) ? 0 : (a.lastVisitTime < b.lastVisitTime) ? -1 : 1;
                         };
-                    } else {
+                    else
                         f = function(a, b){
                             return (a.lastVisitTime == b.lastVisitTime) ? 0 : (a.lastVisitTime > b.lastVisitTime) ? -1 : 1;
                         };
-                    }
                     break;
                 }
                 items.sort(f).forEach(function(item){
@@ -149,10 +149,7 @@ EntryManager.prototype = {
             if (/^(file|chrome):/.test(href)) {
                 var button = e.button;
                 setTimeout(function(){
-                    chrome.tabs.create({
-                        url: href,
-                        selected: (button != 1)
-                    });
+                    self.open(href, (button != 1));
                 },0);
                 e.preventDefault();
             }
@@ -161,6 +158,12 @@ EntryManager.prototype = {
         entry.appendChild(link);
         this._container.appendChild(entry);
         return entry;
+    },
+    _open: function (link, selected) {
+        chrome.tabs.create({
+            url: link,
+            selected: selected
+        });
     },
     filter: function(q) {
         q = q.toLowerCase().split(' ');
@@ -175,12 +178,58 @@ EntryManager.prototype = {
                     break;
                 }
             }
-            if (result == false) {
-                item.elm.setAttribute('class', 'hidden');
-            } else {
-                item.elm.setAttribute('class', '');
+            if (result == false)
+                item.elm.classList.add(this._HIDDEN_CLASS);
+            else
+                item.elm.classList.remove(this._HIDDEN_CLASS);
+        }
+        var cur = this.currentItem;
+        if (cur)
+            cur.classList.remove(this._CURRENT_CLASS);
+    },
+    select: function(increment) {
+        var cur = this.currentIndex;
+        if (cur >= 0)
+            this._items[cur].elm.classList.remove(this._CURRENT_CLASS);
+        for (var i = 0; i < this._items.length; i++) {
+            cur += increment;
+            if (cur >= this._items.length)
+                cur = 0;
+            else if (cur < 0)
+                cur = this._items.length - 1;
+            if (this._items[cur].elm.classList.contains(this._HIDDEN_CLASS))
+                continue;
+            break;
+        }
+        this._items[cur].elm.classList.add(this._CURRENT_CLASS);
+    },
+    openCurrent: function(focus) {
+        var cur = this.currentItem;
+        if (!cur) {
+            for (var i = 0; i < this._items.length; i++) {
+                if (!this._items[i].elm.classList.contains(this._HIDDEN_CLASS)) {
+                    cur = this._items[i];
+                    break;
+                }
             }
         }
+        if (cur) {
+            this._open(cur.data.url, focus);
+        }
+    },
+    get currentIndex() {
+        for (var i = 0; i < this._items.length; i++) {
+            if (this._items[i].elm.classList.contains(this._CURRENT_CLASS))
+                return i;
+        }
+        return -1;
+    },
+    get currentItem() {
+        var cur = this.currentIndex;
+        if (cur >= 0)
+            return this._items[cur];
+        else
+            return null;
     }
 };
 
@@ -211,6 +260,19 @@ window.addEventListener('load', function(e){
                     em.init(query, options.ItemCount, nonDisplayURL, options.Sort, options.Order);
                 else
                     em.filter(query);
+            }
+        }, false);
+        queryElm.addEventListener('keydown', function(e) {
+            switch (e.keyIdentifier) {
+                case 'Down':
+                    em.select(+1);
+                    break;
+                case 'Up':
+                    em.select(-1);
+                    break;
+                case 'Enter':
+                    em.openCurrent(e.shiftKey);
+                    break;
             }
         }, false);
     })();
