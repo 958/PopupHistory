@@ -184,8 +184,10 @@ EntryManager.prototype = {
                 item.elm.classList.remove(this._HIDDEN_CLASS);
         }
         var cur = this.currentItem;
-        if (cur)
+        if (cur) {
             cur.classList.remove(this._CURRENT_CLASS);
+            window.scrollTo(0, 0);
+        }
     },
     select: function(increment) {
         var cur = this.currentIndex;
@@ -202,6 +204,7 @@ EntryManager.prototype = {
             break;
         }
         this._items[cur].elm.classList.add(this._CURRENT_CLASS);
+        this._items[cur].elm.scrollIntoView(false);
     },
     openCurrent: function(focus) {
         var cur = this.currentItem;
@@ -213,8 +216,27 @@ EntryManager.prototype = {
                 }
             }
         }
-        if (cur) {
+        if (cur)
             this._open(cur.data.url, focus);
+    },
+    removeCurrent: function() {
+        var cur = this.currentItem;
+        if (!cur) {
+            for (var i = 0; i < this._items.length; i++) {
+                if (!this._items[i].elm.classList.contains(this._HIDDEN_CLASS)) {
+                    cur = this._items[i];
+                    break;
+                }
+            }
+        }
+        if (cur) {
+            var self = this;
+            chrome.history.deleteUrl(
+                { url: cur.data.url },
+                function() {
+                    cur.elm.parentNode.removeChild(cur.elm);
+                    self._items.splice(self._items.indexOf(cur), 1);
+                });
         }
     },
     get currentIndex() {
@@ -263,17 +285,29 @@ window.addEventListener('load', function(e){
             }
         }, false);
         queryElm.addEventListener('keydown', function(e) {
+            var noDefault = false;
             switch (e.keyIdentifier) {
                 case 'Down':
                     em.select(+1);
+                    noDefault = true;
                     break;
                 case 'Up':
                     em.select(-1);
+                    noDefault = true;
+                    break;
+                case 'U+007F':  // Delete
+                    if (e.shiftKey) {
+                        em.removeCurrent();
+                        noDefault = true;
+                    }
                     break;
                 case 'Enter':
                     em.openCurrent(e.shiftKey);
+                    noDefault = true;
                     break;
             }
+            if (noDefault)
+                e.preventDefault();
         }, false);
     })();
 }, false);
