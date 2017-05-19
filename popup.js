@@ -1,15 +1,3 @@
-/*
-(function(){
-    document.addEventListener('click', function(e){
-        alert(e.shiftKey);
-    },false);
-
-    var evt = document.createEvent('MouseEvents');
-    evt.initEvent( 'click', false, true );
-    document.dispatchEvent(evt);
-})();
-*/
-
 function unique(array) {
     var temp = {};
     for (var i = 0; i < array.length; i++) {
@@ -90,11 +78,13 @@ EntryManager.prototype = {
         chrome.history.search(
             {
                 text: query,
+                startTime: (new Date).getTime() - (1000 * 60 * 60 * 24 * 7),
                 maxResults: count
             },
             function(items){
                 self._container.innerHTML = '';
-                items = unique(items).
+                //items = unique(items).
+                items = items.
                     filter(function(item){
                         return !nonDisplayURL.test(item.url);
                     });
@@ -286,16 +276,28 @@ window.addEventListener('load', function(e){
         }, false);
         queryElm.addEventListener('keydown', function(e) {
             var noDefault = false;
-            switch (e.keyIdentifier) {
-                case 'Down':
+            switch (e.key) {
+                case 'ArrowDown':
                     em.select(+1);
                     noDefault = true;
                     break;
-                case 'Up':
+                case 'n':
+                    if (e.ctrlKey) {
+                        em.select(+1);
+                        noDefault = true;
+                    }
+                    break;
+                case 'ArrowUp':
                     em.select(-1);
                     noDefault = true;
                     break;
-                case 'U+007F':  // Delete
+                case 'p':
+                    if (e.ctrlKey) {
+                        em.select(-1);
+                        noDefault = true;
+                    }
+                    break;
+                case 'Delete':  // Delete
                     if (e.shiftKey) {
                         em.removeCurrent();
                         noDefault = true;
@@ -304,6 +306,9 @@ window.addEventListener('load', function(e){
                 case 'Enter':
                     em.openCurrent(e.shiftKey);
                     noDefault = true;
+                    break;
+                case 'Escape':
+                    window.close();
                     break;
             }
             if (noDefault)
