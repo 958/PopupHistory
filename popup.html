@@ -10,31 +10,29 @@ body {
     padding:0;
 }
 #control {
-    border-top-left-radius: 3px;
-    border-top-right-radius: 3px;
     border-color: hsl(0,0%,85%);
-    background-image: -webkit-gradient(linear, left top, left bottom, from(rgba(95,124,170,1)), to(rgba(37,67,127,1)));
+    background-color: rgba(95,124,170,1);
     padding: 5px;
-    -webkit-box-shadow: 0px 1px 2px gray;
+    box-shadow: 0px 1px 2px gray;
+    display: flex;
+    justify-content: space-between;
 }
 h1 {
     background: url(history.png) no-repeat 0px 50%;
     padding-left: 26px;
-    display: inline;
     font-size: 16pt;
+    margin: 0;
     color: white;
     text-shadow: 1px 1px 1px rgba(17,47,107,1);
     cursor: pointer;
-    height: 24px;
 }
 #search {
-    float:right;
 }
 #search:after {
-    clear: both;
 }
 #query{
     width: 200px;
+    padding: 4px;
 }
 #entries {
     width: 400px;
@@ -60,10 +58,8 @@ h1 {
 #entries>li {
     position:relative;
     border-radius: 2px;
-    border: 1px solid rgba(255,255,255,0); /* transparent white */
 }
 #entries>li:hover, #entries>li.current {
-    background-image: -webkit-gradient(linear, left top, left bottom, from(rgba(255,255,255,0.8)), to(rgba(255,255,255,0)));
     border-color: hsl(0,0%,85%);
     background-color: hsl(0,0%,90%);
 }
@@ -87,7 +83,6 @@ h1 {
     overflow: hidden;
     text-overflow: ellipsis;
     min-height: 2.5em;
-    vertical-align: middle;
 }
 .count {
     position:absolute;
@@ -102,6 +97,39 @@ h1 {
     position:absolute;
     bottom: 2px;
     right: 2px;
+}
+@media (prefers-color-scheme: dark) {
+    body {
+        background-color: #121212;
+        color: #e0e0e0;
+    }
+    #control {
+        border-color: hsl(0,0%,30%);
+        background-color: rgba(95,124,170,0.5);
+        box-shadow: 0px 1px 2px black;
+    }
+    input[type=search]:focus {
+        background:#000;
+    }
+    input[type=search] {
+        background-color: #222;
+        color: #ddd;
+        border: 1px solid rgba(255,255,255,0.2);
+    }
+    #entries>li {
+    }
+    #entries>li:hover, #entries>li.current {
+        background-color: hsl(0,0%,20%);
+    }
+    #entries>li>a {
+        color: #e0e0e0;
+    }
+    #entries>li:hover>a, #entries>li.current>a {
+        color: #ffffff;
+    }
+    .count {
+        background: #555;
+    }
 }
 </style>
 <script src="options.js"></script>

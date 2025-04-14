@@ -83,7 +83,6 @@ EntryManager.prototype = {
             },
             function(items){
                 self._container.innerHTML = '';
-                //items = unique(items).
                 items = items.
                     filter(function(item){
                         return !nonDisplayURL.test(item.url);
@@ -126,8 +125,11 @@ EntryManager.prototype = {
         var entry = document.createElement('li');
         var link = document.createElement('a');
         link.href = item.url;
+        const faviconUrl = new URL(chrome.runtime.getURL("/_favicon/"));
+        faviconUrl.searchParams.set("pageUrl", item.url);
+        faviconUrl.searchParams.set("size", "16");
         link.innerHTML =
-            '<span class="title" style="background-image: url(chrome://favicon/' + item.url + ')">' +
+            `<span class="title" style="background-image: url('${faviconUrl.toString()}')">` +
                 ((item.title != '') ? item.title.escapeHTML() : item.url) + '</span>' +
             '<span class="count">' + item.visitCount.toString() + '</span>' +
             '<span class="date">' + toAgo(item.lastVisitTime) + '</span>';
@@ -152,7 +154,7 @@ EntryManager.prototype = {
     _open: function (link, selected) {
         chrome.tabs.create({
             url: link,
-            selected: selected
+            active: selected
         });
     },
     filter: function(q) {
@@ -256,7 +258,7 @@ window.addEventListener('load', function(e){
         setTimeout(function(){
             chrome.tabs.create({
                 url: 'chrome://history/',
-                selected: (button != 1)
+                active: (button != 1)
             });
         },0);
     }, false);
