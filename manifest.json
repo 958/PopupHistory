@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Pop-up History",
-  "version": "0.3.0",
+  "version": "0.3.2",
   "description": "Pop-up a History",
   "action": {
     "default_icon": "icon.png",
@@ -16,7 +16,6 @@
   },
   "permissions": [
     "history",
-    "tabs",
     "favicon"
   ],
   "options_ui": {
