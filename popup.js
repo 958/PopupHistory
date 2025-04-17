@@ -196,7 +196,7 @@ EntryManager.prototype = {
             break;
         }
         this._items[cur].elm.classList.add(this._CURRENT_CLASS);
-        this._items[cur].elm.scrollIntoView(false);
+        this._items[cur].elm.scrollIntoView({ behavior: 'smooth', block: 'center' });
     },
     openCurrent: function(focus) {
         var cur = this.currentItem;
