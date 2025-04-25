@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Pop-up History",
-  "version": "0.3.2",
+  "version": "0.3.4",
   "description": "Pop-up a History",
   "action": {
     "default_icon": "icon.png",
@@ -21,5 +21,11 @@
   "options_ui": {
     "page": "options.html",
     "open_in_tab": true
-  }
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["_favicon/*"],
+      "matches": ["<all_urls>"]
+    }
+  ]
 }
